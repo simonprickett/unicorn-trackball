@@ -49,7 +49,7 @@ def beep():
 clear_screen()
 current_colour = 1
 blink_set_off = True
-current_brightness = 0.5
+current_brightness = 0.4
 trackball.set_rgbw(**TRACKBALL_COLOURS[current_colour - 1])
 cursor_x = CURSOR_X_HOME
 cursor_y = CURSOR_Y_HOME

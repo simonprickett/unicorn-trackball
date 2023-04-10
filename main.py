@@ -148,4 +148,4 @@ while True:
         graphics.set_pen(COLOURED_PENS[current_colour])
         graphics.pixel(cursor_x, cursor_y)
 
-    sleep(0.02)
+    sleep(0.01)

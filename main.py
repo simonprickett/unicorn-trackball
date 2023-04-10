@@ -10,7 +10,7 @@ i2c = PimoroniI2C(**PINS_BREAKOUT_GARDEN)
 trackball = BreakoutTrackball(i2c)
 last_pressed_time = 0
 BUTTON_DEBOUNCE_TIME = 400
-TRACKBALL_SENSITIVITY = 2
+TRACKBALL_SENSITIVITY = 1.8
 TRACKBALL_COLOURS = [
     { "r": 255, "g": 0, "b": 0, "w": 0 },
     { "r": 0, "g": 255, "b": 0, "w": 0 },
@@ -144,5 +144,6 @@ while True:
         # Reset the pen to the current colour in case this is the last idle/blink before the
         # pen moves again.
         graphics.set_pen(COLOURED_PENS[current_colour])
+        graphics.pixel(cursor_x, cursor_y)
         
     sleep(0.02)

@@ -10,7 +10,8 @@ i2c = PimoroniI2C(**PINS_BREAKOUT_GARDEN)
 trackball = BreakoutTrackball(i2c)
 last_pressed_time = 0
 BUTTON_DEBOUNCE_TIME = 400
-TRACKBALL_SENSITIVITY = 1.9
+TRACKBALL_SENSITIVITY_H = 1.5
+TRACKBALL_SENSITIVITY_V = 1.8
 TRACKBALL_COLOURS = [
     { "r": 255, "g": 0, "b": 0, "w": 0 },
     { "r": 0, "g": 255, "b": 0, "w": 0 },
@@ -72,28 +73,28 @@ while True:
             graphics.set_pen(COLOURED_PENS[current_colour])
             state_changed = True
             
-    elif state[BreakoutTrackball.LEFT] > TRACKBALL_SENSITIVITY:
+    elif state[BreakoutTrackball.LEFT] > TRACKBALL_SENSITIVITY_H:
         if cursor_x > 0:
             cursor_x -= 1
             state_changed = True
         else:
             beep()
 
-    elif state[BreakoutTrackball.RIGHT] > TRACKBALL_SENSITIVITY:
+    elif state[BreakoutTrackball.RIGHT] > TRACKBALL_SENSITIVITY_H:
         if cursor_x < (DISPLAY_WIDTH - 1):
             cursor_x += 1
             state_changed = True
         else:
             beep()
         
-    elif state[BreakoutTrackball.UP] > TRACKBALL_SENSITIVITY:
+    elif state[BreakoutTrackball.UP] > TRACKBALL_SENSITIVITY_V:
         if cursor_y > 0:
             cursor_y -= 1
             state_changed = True
         else:
             beep()
         
-    elif state[BreakoutTrackball.DOWN] > TRACKBALL_SENSITIVITY:
+    elif state[BreakoutTrackball.DOWN] > TRACKBALL_SENSITIVITY_V:
         if cursor_y < (DISPLAY_HEIGHT - 1):
             cursor_y += 1
             state_changed = True            
@@ -123,11 +124,11 @@ while True:
     gu.set_brightness(current_brightness)
     graphics.pixel(cursor_x, cursor_y)
 
-    # If the state changed, update the display and reset the blink time.
+    # If the state changed, update the display.
     if state_changed:
         gu.update(graphics)
     else:
-        # No state change, so flash the current cursor position.
+        # No state change, so flash the current cursor position instead.
         # Alternate between painting the current pixel with the black pen and the current_colour pen.
         time_diff = ticks_diff(time_now, last_blinked_time)
         
@@ -146,5 +147,5 @@ while True:
         # pen moves again.
         graphics.set_pen(COLOURED_PENS[current_colour])
         graphics.pixel(cursor_x, cursor_y)
-        
+
     sleep(0.02)

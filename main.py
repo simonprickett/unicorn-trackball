@@ -54,6 +54,7 @@ clear_screen()
 current_colour = 0
 blink_set_off = True
 erase_mode = False
+erase_mode_toggle_time = 0
 current_brightness = 0.4
 trackball.set_rgbw(**TRACKBALL_COLOURS[current_colour])
 cursor_x = CURSOR_X_HOME
@@ -119,8 +120,11 @@ while True:
         
     # Check if button B (toggle erase mode) was pressed...
     if gu.is_pressed(GalacticUnicorn.SWITCH_B):
-        # TODO this might need some debounce on it.
-        erase_mode = not erase_mode
+        time_diff = ticks_diff(time_now, erase_mode_toggle_time)
+        
+        if time_diff >= BUTTON_DEBOUNCE_TIME:
+            erase_mode = not erase_mode
+            erase_mode_toggle_time = time_now
         
     # Check if the brightness needs to be adjusted up or down...
     if gu.is_pressed(GalacticUnicorn.SWITCH_BRIGHTNESS_UP):
@@ -148,9 +152,7 @@ while True:
             if blink_set_off is True:
                 graphics.set_pen(BLACK_PEN)
             else:
-                # TODO maybe also set the track ball to erase colour?
                 graphics.set_pen(ERASER_PEN if erase_mode == True else COLOURED_PENS[current_colour])
-                #graphics.set_pen(COLOURED_PENS[current_colour])
   
             graphics.pixel(cursor_x, cursor_y)
             blink_set_off = not blink_set_off

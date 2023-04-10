@@ -126,7 +126,6 @@ while True:
     # If the state changed, update the display and reset the blink time.
     if state_changed:
         gu.update(graphics)
-        last_blinked_time = 0 # TODO IS THIS EVEN NEEDED?
     else:
         # No state change, so flash the current cursor position.
         # Alternate between painting the current pixel with the black pen and the current_colour pen.

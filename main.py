@@ -26,18 +26,16 @@ CURSOR_Y_HOME = DISPLAY_HEIGHT // 2
 BLINK_IDLE_TIME = 500
 last_blinked_time = 0
 
-# First pen (0 index) is black, 1... end are colours to use for painting.
-BLACK = 0
+# Define the pens we will use to colour in the screen.
+BLACK_PEN = graphics.create_pen(0, 0, 0)
 COLOURED_PENS = [
-    graphics.create_pen(0, 0, 0),
     graphics.create_pen(255, 0, 0),
     graphics.create_pen(0, 255, 0),
     graphics.create_pen(0, 0, 255)
 ]
 
 def clear_screen():
-    # Use the black pen.
-    graphics.set_pen(COLOURED_PENS[BLACK])
+    graphics.set_pen(BLACK_PEN)
     graphics.clear()
     gu.update(graphics)
     
@@ -47,10 +45,10 @@ def beep():
     
 # Main program begins here, clear screen and initialise trackball colour.
 clear_screen()
-current_colour = 1
+current_colour = 0
 blink_set_off = True
 current_brightness = 0.4
-trackball.set_rgbw(**TRACKBALL_COLOURS[current_colour - 1])
+trackball.set_rgbw(**TRACKBALL_COLOURS[current_colour])
 cursor_x = CURSOR_X_HOME
 cursor_y = CURSOR_Y_HOME
 
@@ -69,8 +67,8 @@ while True:
         
         if time_diff >= BUTTON_DEBOUNCE_TIME:
             last_pressed_time = time_now
-            current_colour = current_colour + 1 if current_colour < len(TRACKBALL_COLOURS) else 1
-            trackball.set_rgbw(**TRACKBALL_COLOURS[current_colour - 1])
+            current_colour = current_colour + 1 if current_colour < len(TRACKBALL_COLOURS) - 1 else 0
+            trackball.set_rgbw(**TRACKBALL_COLOURS[current_colour])
             graphics.set_pen(COLOURED_PENS[current_colour])
             state_changed = True
             
@@ -125,17 +123,21 @@ while True:
     gu.set_brightness(current_brightness)
     graphics.pixel(cursor_x, cursor_y)
 
-    # Only update the display if something changed.
+    # If the state changed, update the display and reset the blink time.
     if state_changed:
         gu.update(graphics)
-        last_blinked_time = 0
+        last_blinked_time = 0 # TODO IS THIS EVEN NEEDED?
     else:
         # No state change, so flash the current cursor position.
         # Alternate between painting the current pixel with the black pen and the current_colour pen.
         time_diff = ticks_diff(time_now, last_blinked_time)
         
-        if time_diff >= BLINK_IDLE_TIME:            
-            graphics.set_pen(COLOURED_PENS[BLACK if blink_set_off is True else current_colour])
+        if time_diff >= BLINK_IDLE_TIME:
+            if blink_set_off is True:
+                graphics.set_pen(BLACK_PEN)
+            else:
+                graphics.set_pen(COLOURED_PENS[current_colour])
+  
             graphics.pixel(cursor_x, cursor_y)
             blink_set_off = not blink_set_off
             last_blinked_time = time_now

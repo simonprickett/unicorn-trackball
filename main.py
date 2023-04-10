@@ -33,6 +33,7 @@ last_blinked_time = 0
 
 # Define the pens we will use to colour in the screen.
 BLACK_PEN = graphics.create_pen(0, 0, 0)
+ERASER_PEN = graphics.create_pen(255, 255, 255)
 
 # We need one pen for each colour we are going to draw with.
 COLOURED_PENS = []
@@ -52,6 +53,7 @@ def beep():
 clear_screen()
 current_colour = 0
 blink_set_off = True
+erase_mode = False
 current_brightness = 0.4
 trackball.set_rgbw(**TRACKBALL_COLOURS[current_colour])
 cursor_x = CURSOR_X_HOME
@@ -112,7 +114,13 @@ while True:
         cursor_y = CURSOR_Y_HOME
         # Keeping the current colour, you could argue this should reset to the initial colour...
         graphics.set_pen(COLOURED_PENS[current_colour])
+        erase_mode = False
         state_changed = True
+        
+    # Check if button B (toggle erase mode) was pressed...
+    if gu.is_pressed(GalacticUnicorn.SWITCH_B):
+        # TODO this might need some debounce on it.
+        erase_mode = not erase_mode
         
     # Check if the brightness needs to be adjusted up or down...
     if gu.is_pressed(GalacticUnicorn.SWITCH_BRIGHTNESS_UP):
@@ -140,7 +148,9 @@ while True:
             if blink_set_off is True:
                 graphics.set_pen(BLACK_PEN)
             else:
-                graphics.set_pen(COLOURED_PENS[current_colour])
+                # TODO maybe also set the track ball to erase colour?
+                graphics.set_pen(ERASER_PEN if erase_mode == True else COLOURED_PENS[current_colour])
+                #graphics.set_pen(COLOURED_PENS[current_colour])
   
             graphics.pixel(cursor_x, cursor_y)
             blink_set_off = not blink_set_off
@@ -149,7 +159,7 @@ while True:
             
         # Reset the pen to the current colour in case this is the last idle/blink before the
         # pen moves again.
-        graphics.set_pen(COLOURED_PENS[current_colour])
+        graphics.set_pen(COLOURED_PENS[current_colour] if erase_mode == False else BLACK_PEN)
         graphics.pixel(cursor_x, cursor_y)
 
     sleep(0.01)

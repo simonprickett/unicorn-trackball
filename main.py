@@ -14,8 +14,12 @@ TRACKBALL_SENSITIVITY_H = 1.5
 TRACKBALL_SENSITIVITY_V = 1.8
 TRACKBALL_COLOURS = [
     { "r": 255, "g": 0, "b": 0, "w": 0 },
+    { "r": 250, "g": 108, "b": 0, "w": 0 },
+    { "r": 255, "g": 247, "b": 0, "w": 0 },
     { "r": 0, "g": 255, "b": 0, "w": 0 },
-    { "r": 0, "g": 0, "b": 255, "w": 0 }
+    { "r": 13, "g": 255, "b": 159, "w": 0 },
+    { "r": 0, "g": 0, "b": 255, "w": 0 },
+    { "r": 94, "g": 13, "b": 255, "w": 0 } 
 ]
 
 # Galactic Unicorn graphics setup.
@@ -29,11 +33,11 @@ last_blinked_time = 0
 
 # Define the pens we will use to colour in the screen.
 BLACK_PEN = graphics.create_pen(0, 0, 0)
-COLOURED_PENS = [
-    graphics.create_pen(255, 0, 0),
-    graphics.create_pen(0, 255, 0),
-    graphics.create_pen(0, 0, 255)
-]
+
+# We need one pen for each colour we are going to draw with.
+COLOURED_PENS = []
+for colour in TRACKBALL_COLOURS:
+    COLOURED_PENS.append(graphics.create_pen(colour["r"], colour["g"], colour["b"]))
 
 def clear_screen():
     graphics.set_pen(BLACK_PEN)

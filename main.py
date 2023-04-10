@@ -10,7 +10,7 @@ i2c = PimoroniI2C(**PINS_BREAKOUT_GARDEN)
 trackball = BreakoutTrackball(i2c)
 last_pressed_time = 0
 BUTTON_DEBOUNCE_TIME = 400
-TRACKBALL_SENSITIVITY = 1.8
+TRACKBALL_SENSITIVITY = 1.9
 TRACKBALL_COLOURS = [
     { "r": 255, "g": 0, "b": 0, "w": 0 },
     { "r": 0, "g": 255, "b": 0, "w": 0 },

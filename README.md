@@ -1,1 +1,3 @@
-# galactic-trackball
+# unicorn-trackball
+
+TODO write the README!

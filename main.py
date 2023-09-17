@@ -1,4 +1,4 @@
-from galactic import GalacticUnicorn
+from galactic import GalacticUnicorn as Unicorn
 from pimoroni_i2c import PimoroniI2C
 from picographics import PicoGraphics, DISPLAY_GALACTIC_UNICORN as DISPLAY
 from breakout_trackball import BreakoutTrackball
@@ -23,7 +23,7 @@ TRACKBALL_COLOURS = [
 ]
 
 # Galactic Unicorn graphics setup.
-gu = GalacticUnicorn()
+gu = Unicorn()
 graphics = PicoGraphics(DISPLAY)
 DISPLAY_WIDTH, DISPLAY_HEIGHT = graphics.get_bounds()
 CURSOR_X_HOME = DISPLAY_WIDTH // 2
@@ -109,7 +109,7 @@ while True:
             beep()
 
     # Check if button A (clear screen) was pressed...
-    if gu.is_pressed(GalacticUnicorn.SWITCH_A):
+    if gu.is_pressed(Unicorn.SWITCH_A):
         clear_screen()
         cursor_x = CURSOR_X_HOME
         cursor_y = CURSOR_Y_HOME
@@ -119,7 +119,7 @@ while True:
         state_changed = True
         
     # Check if button B (toggle erase mode) was pressed...
-    if gu.is_pressed(GalacticUnicorn.SWITCH_B):
+    if gu.is_pressed(Unicorn.SWITCH_B):
         time_diff = ticks_diff(time_now, erase_mode_toggle_time)
         
         if time_diff >= BUTTON_DEBOUNCE_TIME:
@@ -127,12 +127,12 @@ while True:
             erase_mode_toggle_time = time_now
         
     # Check if the brightness needs to be adjusted up or down...
-    if gu.is_pressed(GalacticUnicorn.SWITCH_BRIGHTNESS_UP):
+    if gu.is_pressed(Unicorn.SWITCH_BRIGHTNESS_UP):
         if current_brightness < 1:
             current_brightness += 0.01
             state_changed = True
     
-    if gu.is_pressed(GalacticUnicorn.SWITCH_BRIGHTNESS_DOWN):
+    if gu.is_pressed(Unicorn.SWITCH_BRIGHTNESS_DOWN):
         if current_brightness > 0.1:
             current_brightness -= 0.01
             state_changed = True
@@ -165,3 +165,4 @@ while True:
         graphics.pixel(cursor_x, cursor_y)
 
     sleep(0.01)
+

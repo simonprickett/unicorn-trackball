@@ -22,8 +22,8 @@ TRACKBALL_COLOURS = [
     { "r": 94, "g": 13, "b": 255, "w": 0 } 
 ]
 
-# Galactic Unicorn graphics setup.
-gu = Unicorn()
+# Unicorn graphics setup.
+unicorn = Unicorn()
 graphics = PicoGraphics(DISPLAY)
 DISPLAY_WIDTH, DISPLAY_HEIGHT = graphics.get_bounds()
 CURSOR_X_HOME = DISPLAY_WIDTH // 2
@@ -43,7 +43,7 @@ for colour in TRACKBALL_COLOURS:
 def clear_screen():
     graphics.set_pen(BLACK_PEN)
     graphics.clear()
-    gu.update(graphics)
+    unicorn.update(graphics)
     
 def beep():
     # TODO
@@ -62,8 +62,8 @@ cursor_y = CURSOR_Y_HOME
 
 graphics.set_pen(COLOURED_PENS[current_colour])
 graphics.pixel(cursor_x, cursor_y)
-gu.set_brightness(current_brightness)
-gu.update(graphics)
+unicorn.set_brightness(current_brightness)
+unicorn.update(graphics)
 
 while True:
     state = trackball.read()
@@ -109,7 +109,7 @@ while True:
             beep()
 
     # Check if button A (clear screen) was pressed...
-    if gu.is_pressed(Unicorn.SWITCH_A):
+    if unicorn.is_pressed(Unicorn.SWITCH_A):
         clear_screen()
         cursor_x = CURSOR_X_HOME
         cursor_y = CURSOR_Y_HOME
@@ -119,7 +119,7 @@ while True:
         state_changed = True
         
     # Check if button B (toggle erase mode) was pressed...
-    if gu.is_pressed(Unicorn.SWITCH_B):
+    if unicorn.is_pressed(Unicorn.SWITCH_B):
         time_diff = ticks_diff(time_now, erase_mode_toggle_time)
         
         if time_diff >= BUTTON_DEBOUNCE_TIME:
@@ -127,22 +127,22 @@ while True:
             erase_mode_toggle_time = time_now
         
     # Check if the brightness needs to be adjusted up or down...
-    if gu.is_pressed(Unicorn.SWITCH_BRIGHTNESS_UP):
+    if unicorn.is_pressed(Unicorn.SWITCH_BRIGHTNESS_UP):
         if current_brightness < 1:
             current_brightness += 0.01
             state_changed = True
     
-    if gu.is_pressed(Unicorn.SWITCH_BRIGHTNESS_DOWN):
+    if unicorn.is_pressed(Unicorn.SWITCH_BRIGHTNESS_DOWN):
         if current_brightness > 0.1:
             current_brightness -= 0.01
             state_changed = True
 
-    gu.set_brightness(current_brightness)
+    unicorn.set_brightness(current_brightness)
     graphics.pixel(cursor_x, cursor_y)
 
     # If the state changed, update the display.
     if state_changed:
-        gu.update(graphics)
+        unicorn.update(graphics)
     else:
         # No state change, so flash the current cursor position instead.
         # Alternate between painting the current pixel with the black pen and the current_colour pen.
@@ -157,7 +157,7 @@ while True:
             graphics.pixel(cursor_x, cursor_y)
             blink_set_off = not blink_set_off
             last_blinked_time = time_now
-            gu.update(graphics)
+            unicorn.update(graphics)
             
         # Reset the pen to the current colour in case this is the last idle/blink before the
         # pen moves again.

@@ -1,6 +1,14 @@
-from galactic import GalacticUnicorn as Unicorn
+# Figure out which device we are running on...
+try:
+    from galactic import GalacticUnicorn as Unicorn
+    from picographics import DISPLAY_GALACTIC_UNICORN as DISPLAY
+except ImportError:
+    # TODO Handle the Stellar Unicorn when we have one to try it out on...
+    from cosmic import CosmicUnicorn as Unicorn
+    from picographics import DISPLAY_COSMIC_UNICORN as DISPLAY
+    
 from pimoroni_i2c import PimoroniI2C
-from picographics import PicoGraphics, DISPLAY_GALACTIC_UNICORN as DISPLAY
+from picographics import PicoGraphics
 from breakout_trackball import BreakoutTrackball
 from time import sleep, ticks_ms, ticks_diff
 

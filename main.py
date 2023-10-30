@@ -1,3 +1,25 @@
+'''
+Trackball breakout demo for Unicorn displays.  This works like an 
+etch a sketch:
+
+* Roll the trackball around to draw in the current colour.
+* Press the trackball to cycle through available colour choices.
+* Press the A button to clear the screen and start again.
+* Press the B button to toggle eraser mode.
+* Use the lux buttons to adjust the brightness.
+
+Setup:
+
+* Connect the trackball breakout to QW/ST connector 1 on your Unicorn.
+
+This has been tested with Galactic, Cosmic and Stellar Unicorns.
+'''
+
+from pimoroni_i2c import PimoroniI2C
+from picographics import PicoGraphics
+from breakout_trackball import BreakoutTrackball
+from time import sleep, ticks_ms, ticks_diff
+
 # Figure out which device we are running on...
 try:
     # Try the Galactic Unicorn first...
@@ -12,11 +34,6 @@ except ImportError:
         # Must be a Stellar Unicorn!
         from stellar import StellarUnicorn as Unicorn
         from picographics import DISPLAY_STELLAR_UNICORN as DISPLAY
-    
-from pimoroni_i2c import PimoroniI2C
-from picographics import PicoGraphics
-from breakout_trackball import BreakoutTrackball
-from time import sleep, ticks_ms, ticks_diff
 
 # Trackball setup.
 PINS_BREAKOUT_GARDEN = {"sda": 4, "scl": 5, "baudrate": 100000}
@@ -33,7 +50,7 @@ TRACKBALL_COLOURS = [
     { "r": 0, "g": 255, "b": 0, "w": 0 },
     { "r": 13, "g": 255, "b": 159, "w": 0 },
     { "r": 0, "g": 0, "b": 255, "w": 0 },
-    { "r": 94, "g": 13, "b": 255, "w": 0 } 
+    { "r": 94, "g": 13, "b": 255, "w": 0 }
 ]
 
 # Unicorn graphics setup.
@@ -55,14 +72,18 @@ for colour in TRACKBALL_COLOURS:
     COLOURED_PENS.append(graphics.create_pen(colour["r"], colour["g"], colour["b"]))
 
 def clear_screen():
+    ''' Utility function to clear the screen. '''
     graphics.set_pen(BLACK_PEN)
     graphics.clear()
     unicorn.update(graphics)
-    
+
+
 def beep():
+    ''' Utility function to make a noise. '''
     # TODO
     pass
-    
+
+
 # Main program begins here, clear screen and initialise trackball colour.
 clear_screen()
 current_colour = 0
@@ -83,17 +104,21 @@ while True:
     state = trackball.read()
     state_changed = False
     time_now = ticks_ms()
-    
+
     if state[BreakoutTrackball.SW_PRESSED]:
         time_diff = ticks_diff(time_now, last_pressed_time)
-        
+
         if time_diff >= BUTTON_DEBOUNCE_TIME:
             last_pressed_time = time_now
-            current_colour = current_colour + 1 if current_colour < len(TRACKBALL_COLOURS) - 1 else 0
+            if current_colour < len(TRACKBALL_COLOURS) -1:
+                current_colour += 1
+            else:
+                current_colour = 0
+
             trackball.set_rgbw(**TRACKBALL_COLOURS[current_colour])
             graphics.set_pen(COLOURED_PENS[current_colour])
             state_changed = True
-            
+
     elif state[BreakoutTrackball.LEFT] > TRACKBALL_SENSITIVITY_H:
         if cursor_x > 0:
             cursor_x -= 1
@@ -107,18 +132,18 @@ while True:
             state_changed = True
         else:
             beep()
-        
+
     elif state[BreakoutTrackball.UP] > TRACKBALL_SENSITIVITY_V:
         if cursor_y > 0:
             cursor_y -= 1
             state_changed = True
         else:
             beep()
-        
+
     elif state[BreakoutTrackball.DOWN] > TRACKBALL_SENSITIVITY_V:
         if cursor_y < (DISPLAY_HEIGHT - 1):
             cursor_y += 1
-            state_changed = True            
+            state_changed = True
         else:
             beep()
 
@@ -131,21 +156,21 @@ while True:
         graphics.set_pen(COLOURED_PENS[current_colour])
         erase_mode = False
         state_changed = True
-        
+
     # Check if button B (toggle erase mode) was pressed...
     if unicorn.is_pressed(Unicorn.SWITCH_B):
         time_diff = ticks_diff(time_now, erase_mode_toggle_time)
-        
+
         if time_diff >= BUTTON_DEBOUNCE_TIME:
             erase_mode = not erase_mode
             erase_mode_toggle_time = time_now
-        
+
     # Check if the brightness needs to be adjusted up or down...
     if unicorn.is_pressed(Unicorn.SWITCH_BRIGHTNESS_UP):
         if current_brightness < 1:
             current_brightness += 0.01
             state_changed = True
-    
+
     if unicorn.is_pressed(Unicorn.SWITCH_BRIGHTNESS_DOWN):
         if current_brightness > 0.1:
             current_brightness -= 0.01
@@ -159,24 +184,31 @@ while True:
         unicorn.update(graphics)
     else:
         # No state change, so flash the current cursor position instead.
-        # Alternate between painting the current pixel with the black pen and the current_colour pen.
+        # Alternate between painting the current pixel with the black
+        # pen and the current_colour pen.
         time_diff = ticks_diff(time_now, last_blinked_time)
-        
+
         if time_diff >= BLINK_IDLE_TIME:
             if blink_set_off is True:
                 graphics.set_pen(BLACK_PEN)
             else:
-                graphics.set_pen(ERASER_PEN if erase_mode == True else COLOURED_PENS[current_colour])
-  
+                if erase_mode is True:
+                    graphics.set_pen(ERASER_PEN)
+                else:
+                    graphics.set_pen(COLOURED_PENS[current_colour])
+
             graphics.pixel(cursor_x, cursor_y)
             blink_set_off = not blink_set_off
             last_blinked_time = time_now
             unicorn.update(graphics)
-            
+
         # Reset the pen to the current colour in case this is the last idle/blink before the
         # pen moves again.
-        graphics.set_pen(COLOURED_PENS[current_colour] if erase_mode == False else BLACK_PEN)
+        if erase_mode is False:
+            graphics.set_pen(COLOURED_PENS[current_colour])
+        else:
+            graphics.set_pen(BLACK_PEN)
+
         graphics.pixel(cursor_x, cursor_y)
 
     sleep(0.01)
-

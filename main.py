@@ -1,11 +1,17 @@
 # Figure out which device we are running on...
 try:
+    # Try the Galactic Unicorn first...
     from galactic import GalacticUnicorn as Unicorn
     from picographics import DISPLAY_GALACTIC_UNICORN as DISPLAY
 except ImportError:
-    # TODO Handle the Stellar Unicorn when we have one to try it out on...
-    from cosmic import CosmicUnicorn as Unicorn
-    from picographics import DISPLAY_COSMIC_UNICORN as DISPLAY
+    # OK maybe it's a Cosmic Unicorn?
+    try:
+        from cosmic import CosmicUnicorn as Unicorn
+        from picographics import DISPLAY_COSMIC_UNICORN as DISPLAY
+    except ImportError:
+        # Must be a Stellar Unicorn!
+        from stellar import StellarUnicorn as Unicorn
+        from picographics import DISPLAY_STELLAR_UNICORN as DISPLAY
     
 from pimoroni_i2c import PimoroniI2C
 from picographics import PicoGraphics
